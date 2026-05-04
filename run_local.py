@@ -7,6 +7,7 @@ Usage:
 """
 
 import asyncio
+import contextlib
 import dataclasses
 import os
 import random
@@ -170,8 +171,37 @@ class LocalAgentRunner:
 
 agent_runner = LocalAgentRunner()
 
+@contextlib.asynccontextmanager
+async def lifespan(app: FastAPI):
+    global _main_loop
+    _main_loop = asyncio.get_event_loop()
+
+    if not os.getenv("GROQ_API_KEY"):
+        print("\n[sentinel] WARNING: GROQ_API_KEY is not set.")
+        print("[sentinel]   The agent will run but LLM calls (triage + RCA) will fail.")
+        print("[sentinel]   Get a free key at https://console.groq.com and add it to .env\n")
+
+    processor.start()
+    gen_thread = threading.Thread(target=generator.run, daemon=True)
+    gen_thread.start()
+    injector.start()
+    agent_runner.start()
+
+    print("\n[sentinel] running in LOCAL mode (no Redpanda)")
+    print("[sentinel]   API  -> http://localhost:8000")
+    print("[sentinel]   UI   -> http://localhost:8000")
+    print("[sentinel]   Docs -> http://localhost:8000/docs")
+    print("[sentinel]   Reset demo: POST http://localhost:8000/demo/reset\n")
+
+    yield
+
+    generator.stop()
+    processor.stop()
+    agent_runner.stop()
+
+
 # ── FastAPI app ────────────────────────────────────────────────────
-app = FastAPI(title="sentinel (local)", version="1.0.0")
+app = FastAPI(title="sentinel (local)", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -250,36 +280,6 @@ async def ws_live(websocket: WebSocket):
 _frontend = os.path.join(os.path.dirname(__file__), "frontend")
 if os.path.isdir(_frontend):
     app.mount("/", StaticFiles(directory=_frontend, html=True), name="frontend")
-
-
-@app.on_event("startup")
-async def startup():
-    global _main_loop
-    _main_loop = asyncio.get_event_loop()
-
-    if not os.getenv("GROQ_API_KEY"):
-        print("\n[sentinel] WARNING: GROQ_API_KEY is not set.")
-        print("[sentinel]   The agent will run but LLM calls (triage + RCA) will fail.")
-        print("[sentinel]   Get a free key at https://console.groq.com and add it to .env\n")
-
-    processor.start()
-    gen_thread = threading.Thread(target=generator.run, daemon=True)
-    gen_thread.start()
-    injector.start()
-    agent_runner.start()
-
-    print("\n[sentinel] running in LOCAL mode (no Redpanda)")
-    print("[sentinel]   API  -> http://localhost:8000")
-    print("[sentinel]   UI   -> http://localhost:8000")
-    print("[sentinel]   Docs -> http://localhost:8000/docs")
-    print("[sentinel]   Reset demo: POST http://localhost:8000/demo/reset\n")
-
-
-@app.on_event("shutdown")
-def shutdown():
-    generator.stop()
-    processor.stop()
-    agent_runner.stop()
 
 
 if __name__ == "__main__":
