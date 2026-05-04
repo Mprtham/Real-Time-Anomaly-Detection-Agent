@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>sentinel — Real-Time Anomaly Detection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════ HEADER ══ -->
+<header id="header">
+  <div class="logo">sentinel</div>
+  <div class="header-right">
+    <div class="stat-pill">
+      <span class="live-dot"></span>
+      <span>LIVE</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-label">Events/s</span>
+      <span class="stat-val" id="stat-eps">—</span>
+    </div>
+    <div class="stat-pill">
+      <span class="stat-label">Anomalies/hr</span>
+      <span class="stat-val" id="stat-alast">—</span>
+    </div>
+    <div class="stat-pill agent-node">
+      <span class="node-step" data-node="triage">Triage</span>
+      <span style="color:var(--text-muted)">▶</span>
+      <span class="node-step" data-node="context_fetch">Context</span>
+      <span style="color:var(--text-muted)">▶</span>
+      <span class="node-step" data-node="rca_writer">Writing</span>
+      <span style="color:var(--text-muted)">▶</span>
+      <span class="node-step" data-node="decision">Decision</span>
+    </div>
+  </div>
+</header>
+
+<!-- ════════════════════════════════════════════ MAIN GRID ══ -->
+<main id="main">
+
+  <!-- sidebar -->
+  <aside id="sidebar">
+
+    <div class="widget">
+      <div class="widget-label">System Health</div>
+      <div class="health-ring-wrap">
+        <svg width="64" height="64" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border-mid)" stroke-width="5"/>
+          <circle id="health-ring" cx="32" cy="32" r="26" fill="none"
+            stroke="var(--green)" stroke-width="5"
+            stroke-dasharray="163.4" stroke-dashoffset="0"
+            stroke-linecap="round" transform="rotate(-90 32 32)"/>
+          <text x="32" y="37" text-anchor="middle"
+            font-family="var(--font-mono)" font-size="12" font-weight="700"
+            fill="var(--text-primary)" id="health-pct">—</text>
+        </svg>
+      </div>
+      <div class="metric-row">
+        <span class="metric-name">p99 latency</span>
+        <span class="metric-val" id="sidebar-latency">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-name">error rate</span>
+        <span class="metric-val" id="sidebar-errrate">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-name">orders/min</span>
+        <span class="metric-val" id="sidebar-orders">—</span>
+      </div>
+      <div class="metric-row">
+        <span class="metric-name">revenue/min</span>
+        <span class="metric-val" id="sidebar-revenue">—</span>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-label">Agent Pipeline</div>
+      <div class="agent-node">
+        <span class="node-step" data-node="triage">① Triage</span>
+        <span class="node-step" data-node="context_fetch">② Context Fetch</span>
+        <span class="node-step" data-node="rca_writer">③ RCA Writer</span>
+        <span class="node-step" data-node="decision">④ Decision</span>
+      </div>
+    </div>
+
+    <div class="widget">
+      <div class="widget-label">Inject Anomaly</div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <button class="modal-btn" onclick="inject('revenue_crash')">Revenue Crash</button>
+        <button class="modal-btn" onclick="inject('latency_burst')">Latency Burst</button>
+        <button class="modal-btn" onclick="inject('error_rate_spike')">Error Spike</button>
+        <button class="modal-btn" onclick="inject('revenue_spike')">Revenue Spike</button>
+        <button class="modal-btn" onclick="inject('cart_abandonment')">Cart Abandon</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ticker -->
+  <section id="ticker-panel">
+    <div class="panel-header">Live Event Stream</div>
+    <div id="ticker-wrap">
+      <div id="ticker"></div>
+    </div>
+  </section>
+
+  <!-- anomaly feed -->
+  <aside id="anomaly-feed">
+    <div class="panel-header">Anomaly Feed</div>
+    <div id="anomaly-list">
+      <div id="anomaly-empty" class="anomaly-empty">
+        <div class="anomaly-empty-icon">◎</div>
+        <div class="anomaly-empty-title">Monitoring active</div>
+        <div class="anomaly-empty-sub">Events are streaming. Anomalies will appear here when detected.</div>
+      </div>
+    </div>
+  </aside>
+
+</main>
+
+<!-- ════════════════════════════════════════════ SPARKLINES ══ -->
+<footer id="sparkline-strip"></footer>
+
+<!-- ════════════════════════════════════════════ RCA MODAL ══ -->
+<div id="modal-overlay">
+  <div id="modal">
+    <div id="modal-header">
+      <button id="modal-back">← Back</button>
+      <span id="modal-title">Anomaly</span>
+      <button id="modal-close">✕</button>
+    </div>
+    <div id="modal-body"></div>
+    <div id="modal-footer"></div>
+  </div>
+</div>
+
+<script>
+  async function inject(type) {
+    const r = await fetch(`http://localhost:8000/inject/${type}`, { method: 'POST' });
+    const d = await r.json();
+    console.log('injected', d);
+  }
+</script>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

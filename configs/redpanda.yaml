@@ -1,0 +1,23 @@
+rpk:
+  brokers:
+    - localhost:9092
+
+topics:
+  raw_events:
+    partitions: 4
+    replication_factor: 1
+    config:
+      retention.ms: "3600000"      # 1 hour
+      cleanup.policy: delete
+
+  anomaly_alerts:
+    partitions: 1
+    replication_factor: 1
+    config:
+      retention.ms: "86400000"     # 24 hours
+
+  rca_reports:
+    partitions: 1
+    replication_factor: 1
+    config:
+      retention.ms: "604800000"    # 7 days

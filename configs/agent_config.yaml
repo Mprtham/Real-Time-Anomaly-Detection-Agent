@@ -1,0 +1,26 @@
+model: llama-3.3-70b-versatile
+provider: groq
+
+triage:
+  z_score_hard_threshold: 3.2
+  alert_fatigue_window_minutes: 30
+  alert_fatigue_max_count: 3
+  confidence_cutoff: 0.4
+
+rca:
+  max_tokens: 512
+  temperature: 0.3
+  max_words: 300
+
+decision:
+  escalation_confidence_threshold: 0.8
+  monitor_confidence_threshold: 0.5
+  critical_anomaly_types:
+    - revenue_crash
+    - error_rate_spike
+    - order_crash
+  warning_anomaly_types:
+    - revenue_spike
+    - latency_burst
+    - order_spike
+    - cart_abandonment

@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+  redpanda:
+    image: redpandadata/redpanda:latest
+    container_name: sentinel-redpanda
+    command:
+      - redpanda start
+      - --overprovisioned
+      - --smp 1
+      - --memory 512M
+      - --reserve-memory 0M
+      - --node-id 0
+      - --check=false
+      - --kafka-addr PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://localhost:9092
+    ports:
+      - "9092:9092"
+      - "9644:9644"   # admin API
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "info"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redpanda-init:
+    image: redpandadata/redpanda:latest
+    container_name: sentinel-redpanda-init
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    entrypoint: >
+      bash -c "
+        rpk topic create raw_events      --brokers redpanda:9092 --partitions 4 --replicas 1 || true &&
+        rpk topic create anomaly_alerts  --brokers redpanda:9092 --partitions 1 --replicas 1 || true &&
+        rpk topic create rca_reports     --brokers redpanda:9092 --partitions 1 --replicas 1 || true &&
+        echo 'Topics created.'
+      "
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentinel-api
+    depends_on:
+      redpanda:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    environment:
+      - REDPANDA_BROKERS=redpanda:9092
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+      - ANOMALY_Z_THRESHOLD=${ANOMALY_Z_THRESHOLD:-3.0}
+      - TRIAGE_CONFIDENCE_CUTOFF=${TRIAGE_CONFIDENCE_CUTOFF:-0.4}
+      - ESCALATION_CONFIDENCE=${ESCALATION_CONFIDENCE:-0.8}
+      - ALERT_COOLDOWN_MINUTES=${ALERT_COOLDOWN_MINUTES:-10}
+      - CORS_ORIGINS=${CORS_ORIGINS:-["*"]}
+    volumes:
+      - ./sentinel.db:/app/sentinel.db
+    restart: unless-stopped
