@@ -142,8 +142,16 @@
 </div>
 
 <script>
+  // ── Backend URL configuration ─────────────────────────────────────
+  // Hosting on GitHub Pages? Set this to your Railway / Render backend URL.
+  // Example: window.SENTINEL_API = 'https://your-app.up.railway.app';
+  // Leave empty when running locally or when FastAPI itself serves this file.
+  window.SENTINEL_API = '';
+</script>
+<script>
   async function inject(type) {
-    const r = await fetch(`http://localhost:8000/inject/${type}`, { method: 'POST' });
+    const base = window.SENTINEL_API || 'http://localhost:8000';
+    const r = await fetch(`${base}/inject/${type}`, { method: 'POST' });
     const d = await r.json();
     console.log('injected', d);
   }

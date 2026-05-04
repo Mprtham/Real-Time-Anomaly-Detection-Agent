@@ -1,11 +1,11 @@
-// Resolve API base URL:
-//   - local dev (localhost/127.0.0.1): always port 8000
-//   - cloud / same-origin deploy: use window.location.origin (no port suffix)
-const _loc    = window.location;
+// Resolve API base URL — three cases handled in priority order:
+//   1. window.SENTINEL_API set in index.html → use that (GitHub Pages → external backend)
+//   2. localhost/127.0.0.1                   → local dev, always port 8000
+//   3. everything else                        → same-origin (FastAPI serves this file)
+const _loc     = window.location;
 const _isLocal = _loc.hostname === 'localhost' || _loc.hostname === '127.0.0.1';
-const API_BASE = _isLocal
-  ? `${_loc.protocol}//${_loc.hostname}:8000`
-  : _loc.origin;
+const API_BASE = window.SENTINEL_API
+  || (_isLocal ? `${_loc.protocol}//${_loc.hostname}:8000` : _loc.origin);
 
 export async function fetchAnomalies(severity = null, limit = 30) {
   const params = new URLSearchParams({ limit });
