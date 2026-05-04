@@ -1,6 +1,11 @@
-const API_BASE = window.location.hostname === 'localhost'
-  ? 'http://localhost:8000'
-  : `${window.location.protocol}//${window.location.hostname}:8000`;
+// Resolve API base URL:
+//   - local dev (localhost/127.0.0.1): always port 8000
+//   - cloud / same-origin deploy: use window.location.origin (no port suffix)
+const _loc    = window.location;
+const _isLocal = _loc.hostname === 'localhost' || _loc.hostname === '127.0.0.1';
+const API_BASE = _isLocal
+  ? `${_loc.protocol}//${_loc.hostname}:8000`
+  : _loc.origin;
 
 export async function fetchAnomalies(severity = null, limit = 30) {
   const params = new URLSearchParams({ limit });
@@ -37,17 +42,26 @@ export function openSSE(onEvent) {
   es.onmessage = e => {
     try { onEvent(JSON.parse(e.data)); } catch (_) {}
   };
-  es.onerror = () => { /* reconnects automatically */ };
+  es.onerror = () => { /* browser reconnects automatically */ };
   return es;
 }
 
-export function openWS(onMessage) {
-  const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
-  const host  = API_BASE.replace(/^https?:\/\//, '');
+export function openWS(onMessage, _attempt = 0) {
+  const proto = _loc.protocol === 'https:' ? 'wss' : 'ws';
+  const host  = _isLocal ? `${_loc.hostname}:8000` : _loc.host;
   const ws    = new WebSocket(`${proto}://${host}/ws/live`);
+
   ws.onmessage = e => {
     try { onMessage(JSON.parse(e.data)); } catch (_) {}
   };
-  ws.onclose = () => setTimeout(() => openWS(onMessage), 2000);
+
+  ws.onopen  = () => { _attempt = 0; };  // reset backoff on successful connect
+
+  ws.onclose = () => {
+    // Exponential backoff: 2s, 3s, 4.5s … capped at 30s
+    const delay = Math.min(30000, 2000 * Math.pow(1.5, _attempt));
+    setTimeout(() => openWS(onMessage, _attempt + 1), delay);
+  };
+
   return ws;
 }

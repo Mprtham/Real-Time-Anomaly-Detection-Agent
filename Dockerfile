@@ -13,4 +13,6 @@ COPY . .
 
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# PORT env var is respected for cloud platforms (Railway, Render, Cloud Run, Heroku).
+# Falls back to 8000 for plain Docker usage.
+CMD python -m uvicorn run_local:app --host 0.0.0.0 --port ${PORT:-8000}

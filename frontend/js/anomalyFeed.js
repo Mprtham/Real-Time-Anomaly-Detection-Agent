@@ -1,7 +1,7 @@
 import { openRCAModal } from './rca.js';
 
-const list      = document.getElementById('anomaly-list');
-const emptyEl   = document.getElementById('anomaly-empty');
+const list        = document.getElementById('anomaly-list');
+const emptyEl     = document.getElementById('anomaly-empty');
 const renderedIds = new Set();
 
 const SEV_LABEL = { critical: 'CRIT', warning: 'WARN', info: 'INFO' };
@@ -19,6 +19,15 @@ function fmtTitle(type) {
 
 function _updateEmptyState() {
   if (emptyEl) emptyEl.style.display = renderedIds.size === 0 ? 'flex' : 'none';
+}
+
+function _pruneList() {
+  // Keep DOM bounded to 50 cards; evict oldest and remove their IDs from the dedup set
+  while (list.children.length > 50) {
+    const removed = list.lastChild;
+    if (removed?.dataset?.id) renderedIds.delete(removed.dataset.id);
+    list.removeChild(removed);
+  }
 }
 
 export function renderAnomaly(anomaly, { animate = true } = {}) {
@@ -60,13 +69,11 @@ export function renderAnomaly(anomaly, { animate = true } = {}) {
   });
 
   list.prepend(card);
+  _pruneList();
   _updateEmptyState();
-
-  // Keep list bounded
-  while (list.children.length > 50) list.removeChild(list.lastChild);
 }
 
 export function loadInitialAnomalies(anomalies) {
-  // Render oldest first so newest ends up on top; no animation for historical cards
+  // Render oldest first so newest ends up on top after prepend; no animation for historical cards
   for (const a of [...anomalies].reverse()) renderAnomaly(a, { animate: false });
 }

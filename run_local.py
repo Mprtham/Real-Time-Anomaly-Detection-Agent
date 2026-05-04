@@ -10,7 +10,6 @@ import asyncio
 import dataclasses
 import os
 import random
-import sqlite3
 import threading
 import time
 from queue import Queue
@@ -144,13 +143,12 @@ class LocalAgentRunner:
         self.current_node = "idle"
         self.processed_count += 1
 
-        # Push processed anomaly to connected WebSocket clients
-        action = final_node_state.get("action", "")
-        if action != "dismiss":
-            saved = store.get_anomaly(anomaly.get("anomaly_id", ""))
-            if saved:
-                saved["has_rca"] = bool(store.get_rca(saved["anomaly_id"]))
-                _schedule_broadcast({"type": "anomaly", "data": saved})
+        # Push processed anomaly to WebSocket clients (consistent with agent/runner.py:
+        # always attempt; dismissed anomalies won't be in SQLite so get_anomaly returns None)
+        saved = store.get_anomaly(anomaly.get("anomaly_id", ""))
+        if saved:
+            saved["has_rca"] = bool(store.get_rca(saved["anomaly_id"]))
+            _schedule_broadcast({"type": "anomaly", "data": saved})
 
     def _loop(self):
         self._running = True
@@ -222,13 +220,13 @@ def health():
 @app.post("/demo/reset")
 def demo_reset():
     """Wipe all anomaly and RCA history — useful for clean demo restarts."""
-    db_path = store.db_path
     try:
-        con = sqlite3.connect(db_path)
-        con.execute("DELETE FROM rca_reports")
-        con.execute("DELETE FROM anomalies")
-        con.commit()
-        con.close()
+        with store._lock:
+            con = store._connect()
+            con.execute("DELETE FROM rca_reports")
+            con.execute("DELETE FROM anomalies")
+            con.commit()
+            con.close()
         return {"status": "reset", "message": "Anomaly and RCA history cleared."}
     except Exception as e:
         return {"status": "error", "message": str(e)}
@@ -285,4 +283,5 @@ def shutdown():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="warning")
+    port = int(os.getenv("PORT", os.getenv("API_PORT", "8000")))
+    uvicorn.run(app, host="0.0.0.0", port=port, log_level="warning")
