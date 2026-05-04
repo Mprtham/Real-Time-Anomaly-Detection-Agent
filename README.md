@@ -95,44 +95,7 @@ Starts Redpanda, creates the required topics (`raw_events`, `anomaly_alerts`, `r
 
 ## Hosting (Cloud Deployment)
 
-Sentinel is designed to deploy to any platform that supports Docker or Python. The recommended approach is **Railway** — it auto-detects the `Procfile` and deploys in one click.
-
-### GitHub Pages + Railway (frontend public, backend on cloud)
-
-This is the recommended setup if you want a publicly accessible live demo with a permanent URL.
-
-**Step 1 — Deploy the backend to Railway**
-
-1. Go to [railway.app](https://railway.app) → New Project → Deploy from GitHub repo
-2. Select this repository
-3. Set environment variables in the Railway dashboard:
-   ```
-   GROQ_API_KEY=your_key_here
-   ```
-4. Railway reads the `Procfile` automatically. Note the URL Railway assigns (e.g. `https://sentinel-production.up.railway.app`)
-
-**Step 2 — Point the frontend at your backend**
-
-Open `frontend/index.html` and set your Railway URL:
-
-```html
-<script>
-  window.SENTINEL_API = 'https://sentinel-production.up.railway.app';
-</script>
-```
-
-Commit and push this change.
-
-**Step 3 — Enable GitHub Pages**
-
-1. Go to your repo on GitHub → **Settings** → **Pages**
-2. Under **Source**, select **GitHub Actions**
-3. The workflow in `.github/workflows/deploy-pages.yml` will deploy automatically on every push to `main`
-4. Your frontend will be live at `https://mprtham.github.io/Real-Time-Anomaly-Detection-Agent/`
-
-That's it. The frontend on GitHub Pages talks to your Railway backend. No build step, no CI config to write.
-
----
+Sentinel is designed to deploy to any platform that supports Docker or Python. **Railway** is the recommended host — it serves the frontend and API together from one URL with no extra configuration.
 
 ### Railway (recommended — free tier available)
 
@@ -325,7 +288,6 @@ sentinel/
 │   └── js/                 # api, ticker, anomalyFeed, rca, sparklines, main
 │
 ├── configs/                # Redpanda topic and agent configuration
-├── .github/workflows/      # GitHub Actions — auto-deploys frontend to GitHub Pages
 ├── run_local.py            # Single-process runner — no Kafka needed (use this)
 ├── Procfile                # Railway / Render one-click deploy
 ├── docker-compose.yml      # Full stack: Redpanda + API
