@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>sentinel — Real-Time Anomaly Detection</title>
+  <title>Sentinel — Real-Time Anomaly Detection</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/tokens.css">
   <link rel="stylesheet" href="css/layout.css">
@@ -14,13 +14,17 @@
 </head>
 <body>
 
-<!-- ════════════════════════════════════════════ HEADER ══ -->
+<!-- ══════════════════════════════════════════════════ HEADER ══ -->
 <header id="header">
-  <div class="logo">sentinel</div>
+  <div class="header-brand">
+    <div class="logo">sentinel</div>
+    <span class="header-sep">/</span>
+    <span class="header-byline">by Prathamesh Mishra</span>
+  </div>
   <div class="header-right">
     <div class="stat-pill">
       <span class="live-dot"></span>
-      <span>LIVE</span>
+      <span class="live-label">LIVE</span>
     </div>
     <div class="stat-pill">
       <span class="stat-label">Events/s</span>
@@ -30,105 +34,256 @@
       <span class="stat-label">Anomalies/hr</span>
       <span class="stat-val" id="stat-alast">—</span>
     </div>
-    <div class="stat-pill agent-node">
+    <div class="stat-pill agent-node header-pipeline">
       <span class="node-step" data-node="triage">Triage</span>
-      <span style="color:var(--text-muted)">▶</span>
+      <span class="pipe-arrow">›</span>
       <span class="node-step" data-node="context_fetch">Context</span>
-      <span style="color:var(--text-muted)">▶</span>
-      <span class="node-step" data-node="rca_writer">Writing</span>
-      <span style="color:var(--text-muted)">▶</span>
+      <span class="pipe-arrow">›</span>
+      <span class="node-step" data-node="rca_writer">RCA</span>
+      <span class="pipe-arrow">›</span>
       <span class="node-step" data-node="decision">Decision</span>
     </div>
+    <a href="https://github.com/Mprtham/Real-Time-Anomaly-Detection-Agent" target="_blank" rel="noopener" class="header-gh-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      GitHub
+    </a>
   </div>
 </header>
 
-<!-- ════════════════════════════════════════════ MAIN GRID ══ -->
-<main id="main">
+<!-- ══════════════════════════════════════════════════ HERO ══ -->
+<section id="hero">
+  <div class="hero-glow-top"></div>
+  <div class="hero-grid-bg"></div>
 
-  <!-- sidebar -->
-  <aside id="sidebar">
+  <div class="hero-inner">
+    <!-- left: copy -->
+    <div class="hero-left">
+      <div class="hero-tag">
+        <span class="hero-tag-dot"></span>
+        Real-Time AI Monitoring System
+      </div>
 
-    <div class="widget">
-      <div class="widget-label">System Health</div>
-      <div class="health-ring-wrap">
-        <svg width="64" height="64" viewBox="0 0 64 64">
-          <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border-mid)" stroke-width="5"/>
-          <circle id="health-ring" cx="32" cy="32" r="26" fill="none"
-            stroke="var(--green)" stroke-width="5"
-            stroke-dasharray="163.4" stroke-dashoffset="0"
-            stroke-linecap="round" transform="rotate(-90 32 32)"/>
-          <text x="32" y="37" text-anchor="middle"
-            font-family="var(--font-mono)" font-size="12" font-weight="700"
-            fill="var(--text-primary)" id="health-pct">—</text>
-        </svg>
+      <h1 class="hero-title">
+        Spot problems<br>before your users do.
+      </h1>
+
+      <p class="hero-desc">
+        Sentinel watches a live stream of thousands of events per second — purchases,
+        page loads, errors, API calls — and uses statistical analysis to catch anything
+        that looks off. The moment an anomaly is detected, an AI agent figures out what
+        went wrong, writes a plain-English explanation, and decides whether to alert your team.
+        No manual rules. No tuning required.
+      </p>
+
+      <div class="hero-how">
+        <div class="how-step">
+          <div class="how-num">01</div>
+          <div class="how-text">
+            <strong>Stream</strong> — events flow in at ~80/sec from a live simulator
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">02</div>
+          <div class="how-text">
+            <strong>Detect</strong> — DuckDB computes z-scores over rolling windows
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">03</div>
+          <div class="how-text">
+            <strong>Reason</strong> — a LangGraph agent writes a root-cause analysis via Groq + Llama 3
+          </div>
+        </div>
+        <div class="how-step">
+          <div class="how-num">04</div>
+          <div class="how-text">
+            <strong>Act</strong> — alerts fire to Slack; the full history lives in the dashboard
+          </div>
+        </div>
       </div>
-      <div class="metric-row">
-        <span class="metric-name">p99 latency</span>
-        <span class="metric-val" id="sidebar-latency">—</span>
+
+      <div class="hero-tech-row">
+        <span class="tech-chip">LangGraph</span>
+        <span class="tech-chip">DuckDB</span>
+        <span class="tech-chip">FastAPI</span>
+        <span class="tech-chip">Groq · Llama 3.3 70B</span>
+        <span class="tech-chip">WebSocket / SSE</span>
+        <span class="tech-chip">Python 3.12</span>
       </div>
-      <div class="metric-row">
-        <span class="metric-name">error rate</span>
-        <span class="metric-val" id="sidebar-errrate">—</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-name">orders/min</span>
-        <span class="metric-val" id="sidebar-orders">—</span>
-      </div>
-      <div class="metric-row">
-        <span class="metric-name">revenue/min</span>
-        <span class="metric-val" id="sidebar-revenue">—</span>
-      </div>
+
+      <a href="#dashboard" class="hero-cta" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'});return false;">
+        Open Live Dashboard
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      </a>
     </div>
 
-    <div class="widget">
-      <div class="widget-label">Agent Pipeline</div>
-      <div class="agent-node">
-        <span class="node-step" data-node="triage">① Triage</span>
-        <span class="node-step" data-node="context_fetch">② Context Fetch</span>
-        <span class="node-step" data-node="rca_writer">③ RCA Writer</span>
-        <span class="node-step" data-node="decision">④ Decision</span>
+    <!-- right: demo card + author -->
+    <div class="hero-right">
+      <div class="hero-demo-card">
+        <div class="hcard-header">
+          <div class="hcard-dot critical-dot"></div>
+          <span class="hcard-badge critical">CRITICAL</span>
+          <span class="hcard-ts">just now · auto-detected</span>
+        </div>
+        <div class="hcard-title">Revenue Crash Detected</div>
+        <div class="hcard-desc">
+          Revenue dropped 78 % below the 60-minute baseline.
+          Z-score: <strong>4.2σ</strong>. Anomaly agent dispatched.
+        </div>
+        <div class="hcard-divider"></div>
+        <div class="hcard-pipeline-label">Agent pipeline</div>
+        <div class="hcard-pipeline">
+          <div class="hpipe-step done">Triage ✓</div>
+          <div class="hpipe-arrow">→</div>
+          <div class="hpipe-step done">Context ✓</div>
+          <div class="hpipe-arrow">→</div>
+          <div class="hpipe-step active">Writing RCA</div>
+          <div class="hpipe-arrow">→</div>
+          <div class="hpipe-step pending">Decision</div>
+        </div>
+        <div class="hcard-rca-preview">
+          <span class="rca-cursor">▍</span> Root cause: Payment gateway timeout cascaded into abandoned carts…
+        </div>
+      </div>
+
+      <div class="hero-author">
+        <div class="author-avatar">PM</div>
+        <div class="author-info">
+          <div class="author-name">Prathamesh Mishra</div>
+          <div class="author-role">Builder · AI Systems &amp; Backend Engineering</div>
+        </div>
+        <a href="https://github.com/Mprtham/Real-Time-Anomaly-Detection-Agent" target="_blank" rel="noopener" class="author-gh">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+          View on GitHub
+        </a>
       </div>
     </div>
+  </div>
 
-    <div class="widget">
-      <div class="widget-label">Inject Anomaly</div>
-      <div style="display:flex;flex-direction:column;gap:4px">
-        <button class="modal-btn" onclick="inject('revenue_crash')">Revenue Crash</button>
-        <button class="modal-btn" onclick="inject('latency_burst')">Latency Burst</button>
-        <button class="modal-btn" onclick="inject('error_rate_spike')">Error Spike</button>
-        <button class="modal-btn" onclick="inject('revenue_spike')">Revenue Spike</button>
-        <button class="modal-btn" onclick="inject('cart_abandonment')">Cart Abandon</button>
+  <div class="hero-scroll-hint" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">
+    <div class="scroll-chevron"></div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════ DASHBOARD ══ -->
+<div id="dashboard">
+
+  <div id="dash-header">
+    <div class="dash-title-row">
+      <span class="dash-title">Live Dashboard</span>
+      <span class="dash-sub">streaming in real time — inject an anomaly to watch the agent work</span>
+    </div>
+    <div class="dash-stats">
+      <span class="dash-live-pill">
+        <span class="live-dot-sm"></span>
+        Streaming
+      </span>
+    </div>
+  </div>
+
+  <div id="dash-body">
+
+    <!-- sidebar -->
+    <aside id="sidebar">
+
+      <div class="widget">
+        <div class="widget-label">System Health</div>
+        <div class="health-ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="var(--border-mid)" stroke-width="5"/>
+            <circle id="health-ring" cx="32" cy="32" r="26" fill="none"
+              stroke="var(--green)" stroke-width="5"
+              stroke-dasharray="163.4" stroke-dashoffset="0"
+              stroke-linecap="round" transform="rotate(-90 32 32)"/>
+            <text x="32" y="37" text-anchor="middle"
+              font-family="var(--font-mono)" font-size="12" font-weight="700"
+              fill="var(--text-primary)" id="health-pct">—</text>
+          </svg>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">p99 latency</span>
+          <span class="metric-val" id="sidebar-latency">—</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">error rate</span>
+          <span class="metric-val" id="sidebar-errrate">—</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">orders/min</span>
+          <span class="metric-val" id="sidebar-orders">—</span>
+        </div>
+        <div class="metric-row">
+          <span class="metric-name">revenue/min</span>
+          <span class="metric-val" id="sidebar-revenue">—</span>
+        </div>
       </div>
-    </div>
 
-  </aside>
-
-  <!-- ticker -->
-  <section id="ticker-panel">
-    <div class="panel-header">Live Event Stream</div>
-    <div id="ticker-wrap">
-      <div id="ticker"></div>
-    </div>
-  </section>
-
-  <!-- anomaly feed -->
-  <aside id="anomaly-feed">
-    <div class="panel-header">Anomaly Feed</div>
-    <div id="anomaly-list">
-      <div id="anomaly-empty" class="anomaly-empty">
-        <div class="anomaly-empty-icon">◎</div>
-        <div class="anomaly-empty-title">Monitoring active</div>
-        <div class="anomaly-empty-sub">Events are streaming. Anomalies will appear here when detected.</div>
+      <div class="widget">
+        <div class="widget-label">Agent Pipeline</div>
+        <div class="agent-node">
+          <span class="node-step" data-node="triage">① Triage</span>
+          <span class="node-step" data-node="context_fetch">② Context Fetch</span>
+          <span class="node-step" data-node="rca_writer">③ RCA Writer</span>
+          <span class="node-step" data-node="decision">④ Decision</span>
+        </div>
       </div>
-    </div>
-  </aside>
 
-</main>
+      <div class="widget">
+        <div class="widget-label">Inject Anomaly</div>
+        <div class="inject-list">
+          <button class="inject-btn" onclick="injectAnomaly('revenue_crash')">
+            <span class="inject-icon">↘</span> Revenue Crash
+          </button>
+          <button class="inject-btn" onclick="injectAnomaly('latency_burst')">
+            <span class="inject-icon">⚡</span> Latency Burst
+          </button>
+          <button class="inject-btn" onclick="injectAnomaly('error_rate_spike')">
+            <span class="inject-icon">✕</span> Error Spike
+          </button>
+          <button class="inject-btn" onclick="injectAnomaly('revenue_spike')">
+            <span class="inject-icon">↗</span> Revenue Spike
+          </button>
+          <button class="inject-btn" onclick="injectAnomaly('cart_abandonment')">
+            <span class="inject-icon">↩</span> Cart Abandon
+          </button>
+        </div>
+      </div>
 
-<!-- ════════════════════════════════════════════ SPARKLINES ══ -->
-<footer id="sparkline-strip"></footer>
+    </aside>
 
-<!-- ════════════════════════════════════════════ RCA MODAL ══ -->
+    <!-- ticker -->
+    <section id="ticker-panel">
+      <div class="panel-header">
+        <span>Live Event Stream</span>
+        <span class="panel-header-sub">raw events as they arrive</span>
+      </div>
+      <div id="ticker-wrap">
+        <div id="ticker"></div>
+      </div>
+    </section>
+
+    <!-- anomaly feed -->
+    <aside id="anomaly-feed">
+      <div class="panel-header">
+        <span>Anomaly Feed</span>
+        <span class="panel-header-sub">click any card for full RCA</span>
+      </div>
+      <div id="anomaly-list">
+        <div id="anomaly-empty" class="anomaly-empty">
+          <div class="anomaly-empty-icon">◎</div>
+          <div class="anomaly-empty-title">Monitoring active</div>
+          <div class="anomaly-empty-sub">Events are streaming. Anomalies will appear here when detected — or inject one manually.</div>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- #dash-body -->
+
+  <footer id="sparkline-strip"></footer>
+
+</div><!-- #dashboard -->
+
+<!-- ══════════════════════════════════════════════════ RCA MODAL ══ -->
 <div id="modal-overlay">
   <div id="modal">
     <div id="modal-header">
@@ -142,13 +297,15 @@
 </div>
 
 <script>
-  async function inject(type) {
+  async function injectAnomaly(type) {
     const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
     const base = isLocal ? `${location.protocol}//${location.hostname}:8000` : location.origin;
     const r = await fetch(`${base}/inject/${type}`, { method: 'POST' });
     const d = await r.json();
     console.log('injected', d);
   }
+  /* legacy alias so inline onclick="inject(...)" still works if called anywhere */
+  const inject = injectAnomaly;
 </script>
 <script type="module" src="js/main.js"></script>
 </body>

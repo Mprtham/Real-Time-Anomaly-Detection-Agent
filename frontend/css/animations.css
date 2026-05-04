@@ -1,3 +1,4 @@
+/* ── existing dashboard animations ──────────────────── */
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50%       { opacity: .5; transform: scale(.8); }
@@ -15,7 +16,7 @@
 }
 
 @keyframes ticker-in {
-  from { opacity: 0; background: rgba(0,229,204,.06); }
+  from { opacity: 0; background: rgba(0, 201, 167, .06); }
   to   { opacity: 1; background: transparent; }
 }
 
@@ -23,4 +24,41 @@
 
 .anomaly-card-new {
   animation: slide-in-right .3s var(--ease) forwards;
+}
+
+/* ── hero animations ────────────────────────────────── */
+@keyframes bounce-down {
+  0%, 100% { transform: rotate(45deg) translateY(0);   opacity: .7; }
+  50%       { transform: rotate(45deg) translateY(6px); opacity: 1;  }
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .55; }
+}
+
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* hero entrance — staggered */
+.hero-left > * {
+  animation: fade-up .55s var(--ease) both;
+}
+
+.hero-left .hero-tag         { animation-delay: .05s; }
+.hero-left .hero-title       { animation-delay: .12s; }
+.hero-left .hero-desc        { animation-delay: .19s; }
+.hero-left .hero-how         { animation-delay: .25s; }
+.hero-left .hero-tech-row    { animation-delay: .31s; }
+.hero-left .hero-cta         { animation-delay: .37s; }
+
+.hero-right {
+  animation: fade-up .6s var(--ease) .2s both;
 }
